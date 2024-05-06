@@ -1,0 +1,6 @@
+{
+  "tasks": {
+    "build": "deno compile --allow-run --allow-read --allow-write webcam.ts",
+    "run": "deno run --allow-run --allow-read --allow-write webcam.ts"
+  }
+}

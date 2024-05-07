@@ -24,6 +24,7 @@ const runCameraCapture = async () => {
   const scratchPath = (fn: string) => `${WORK_DIR}/images/scratch/${fn}.jpg`;
   const date = new Date();
   const iso = date.toISOString();
+  const dateString = iso.slice(0, 10);
 
   log.info(`Snapshot [${iso}] being taken...`);
 
@@ -79,7 +80,7 @@ const runCameraCapture = async () => {
     ],
   );
 
-  await Deno.rename(snapshotPath, savePath(iso));
+  await Deno.rename(snapshotPath, savePath(dateString));
 
   log.info(`Snapshot [${iso}] uploading to S3...`);
 
@@ -88,12 +89,12 @@ const runCameraCapture = async () => {
       awsCmd,
       "s3",
       "cp",
-      savePath(iso),
+      savePath(dateString),
       awsBucket,
     ],
   );
 
-  await Deno.rename(savePath(iso), scratchPath(iso));
+  await Deno.rename(savePath(dateString), scratchPath(iso));
 
   log.info(`Snapshot complete: ${savePath(iso)}`);
 

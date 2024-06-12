@@ -1,5 +1,5 @@
 .vscode
 output.log
-images/scratch/*.jpg
-images/scratch/*.mp4
+backup
+images
 webcam

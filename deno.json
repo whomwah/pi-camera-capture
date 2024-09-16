@@ -5,6 +5,7 @@
   },
   "tasks": {
     "build": "deno compile --env -ERW --allow-run webcam.ts",
-    "run": "deno run --env -ERW --allow-run webcam.ts"
+    "run": "deno run --env -ERW --allow-run webcam.ts",
+    "live": "deno run --env -ERW --allow-run webcam-live.ts"
   }
 }

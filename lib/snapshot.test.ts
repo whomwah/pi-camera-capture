@@ -23,6 +23,11 @@ Deno.test("takeSnapshot calls run with correct arguments", async () => {
         "auto",
         "--immediate",
         "--metering",
+        "average",
+        "--awb",
+        "daylight",
+        "--shutter",
+        "10000",
       ],
     ],
   });

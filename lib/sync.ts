@@ -8,12 +8,13 @@ import { env } from "./utils.ts";
  */
 export const syncSnapshot = async (
   run: (args: string[]) => Promise<string>,
+  imagePath: string,
 ) => {
   await run([
     env("AWS_CMD"),
     "s3",
     "sync",
-    `${env("WORK_DIR")}/images/`,
+    `${imagePath}/`,
     env("AWS_BUCKET"),
     "--exclude",
     "*",

@@ -11,10 +11,11 @@ Deno.test("sync calls run with correct arguments", async () => {
   const mockEnv = stub(
     Deno.env,
     "get",
-    returnsNext(["sync", "path", "s3-bucket-name"]),
+    returnsNext(["sync", "s3-bucket-name"]),
   );
+  const filePath = "path/images";
 
-  await syncSnapshot(mockRun);
+  await syncSnapshot(mockRun, filePath);
 
   assertSpyCalls(mockRun, 1);
   assertSpyCall(mockRun, 0, {

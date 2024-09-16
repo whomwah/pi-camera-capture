@@ -25,12 +25,12 @@ const runCameraCapture = async () => {
 
   await executeWithLogging(
     () => Deno.rename(paths.snapshotPath, paths.savePath(dateString)),
-    `Snapshot moved to save path complete`,
-    `Error moving snapshot to save path`,
+    `Snapshot file renamed to ${dateString}`,
+    `Error renaming snapshot to save path`,
   );
 
   await executeWithLogging(
-    () => syncSnapshot(run),
+    () => syncSnapshot(run, paths.imagesDir),
     `Files synced with S3`,
     `Error syncing with S3`,
   );

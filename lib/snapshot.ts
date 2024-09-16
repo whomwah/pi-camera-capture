@@ -23,5 +23,10 @@ export const takeSnapshot = async (
     "auto",
     "--immediate",
     "--metering",
+    "average",
+    "--awb",
+    "daylight",
+    "--shutter",
+    "10000",
   ]);
 };

@@ -9,7 +9,7 @@ import { executeWithLogging, getFormattedDate } from "./lib/utils.ts";
 import { paths } from "./lib/config.ts";
 
 const runCameraCapture = async () => {
-  const { dateString, iso } = getFormattedDate();
+  const { iso } = getFormattedDate();
 
   await executeWithLogging(
     () => takeSnapshot(run, paths.snapshotPath),
@@ -24,8 +24,8 @@ const runCameraCapture = async () => {
   );
 
   await executeWithLogging(
-    () => Deno.rename(paths.snapshotPath, paths.savePath(dateString)),
-    `Snapshot file renamed to ${dateString}`,
+    () => Deno.rename(paths.snapshotPath, paths.savePath(iso)),
+    `Snapshot file renamed to ${iso}`,
     `Error renaming snapshot to save path`,
   );
 
@@ -36,7 +36,7 @@ const runCameraCapture = async () => {
   );
 
   await executeWithLogging(
-    () => Deno.rename(paths.savePath(dateString), paths.scratchPath(iso)),
+    () => Deno.rename(paths.savePath(iso), paths.scratchPath(iso)),
     `Snapshot complete`,
     `Error renaming save and scratch path`,
   );

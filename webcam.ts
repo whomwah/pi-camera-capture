@@ -1,147 +1,51 @@
 #!/usr/bin/env -S deno run --allow-run --allow-read --allow-write
 
-import { run } from "https://deno.land/x/run_simple@2.3.0/mod.ts";
-import * as log from "https://deno.land/std@0.222.1/log/mod.ts";
-
-const WORK_DIR = "/home/webcam/_dev/webcam";
-const SNAPSHOT_CMD = "/usr/bin/libcamera-still";
-const CONVERT_CMD = "/usr/bin/convert";
-const AWS_CMD = "/usr/local/bin/aws";
-const FFMPEG_CMD = "/usr/bin/ffmpeg";
-const AWS_BUCKET = "s3://kyan-office-webcam/";
+import { run } from "run_simple";
+import { takeSnapshot } from "./lib/snapshot.ts";
+import { processSnapshot } from "./lib/process.ts";
+import { syncSnapshot } from "./lib/sync.ts";
+import { createTimeLapseVideo } from "./lib/time-lapse.ts";
+import { executeWithLogging, getFormattedDate } from "./lib/utils.ts";
+import { paths } from "./lib/config.ts";
 
 const runCameraCapture = async () => {
-  const cameraCmd = SNAPSHOT_CMD;
-  const convertCmd = CONVERT_CMD;
-  const awsCmd = AWS_CMD;
-  const awsBucket = AWS_BUCKET;
-  const ffmpegCmd = FFMPEG_CMD;
-  const snapshotPath = `${WORK_DIR}/images/snapshot.jpg`;
-  const videoImagesPath = `${WORK_DIR}/backup/*.jpg`;
-  const videoPath = `${WORK_DIR}/backup/timelapse.mp4`;
+  const { dateString, iso } = getFormattedDate();
 
-  const savePath = (fn: string) => `${WORK_DIR}/images/${fn}.jpg`;
-  const scratchPath = (fn: string) => `${WORK_DIR}/backup/${fn}.jpg`;
-  const date = new Date();
-  const iso = date.toISOString();
-  const dateString = iso.slice(0, 10);
+  await executeWithLogging(
+    () => takeSnapshot(run, paths.snapshotPath),
+    `Snapshot taken: ${paths.snapshotPath}`,
+    `Snapshot [${iso}] failed!`,
+  );
 
-  try {
-    log.info(`Snapshot [${iso}] being taken...`);
+  await executeWithLogging(
+    () => processSnapshot(run, paths.snapshotPath, iso),
+    `Snapshot processed: ${paths.snapshotPath}`,
+    `Snapshot [${iso}] processing failed!`,
+  );
 
-    await run(
-      [
-        cameraCmd,
-        "-o",
-        snapshotPath,
-        "--rotation",
-        "180",
-        "--autofocus-range",
-        "full",
-        "--hdr",
-        "auto",
-        "--immediate",
-        "--metering",
-        "average",
-        "--awb",
-        "daylight",
-        "--shutter",
-        "10000",
-      ],
-    );
-  } catch (e) {
-    log.error(`Snapshot [${iso}] failed!`, e.message);
-    return;
-  }
+  await executeWithLogging(
+    () => Deno.rename(paths.snapshotPath, paths.savePath(dateString)),
+    `Snapshot file renamed to ${dateString}`,
+    `Error renaming snapshot to save path`,
+  );
 
-  try {
-    log.info(`Snapshot [${iso}] processing...`);
+  await executeWithLogging(
+    () => syncSnapshot(run, paths.imagesDir),
+    `Files synced with S3`,
+    `Error syncing with S3`,
+  );
 
-    await run(
-      [
-        convertCmd,
-        snapshotPath,
-        "-font",
-        "Helvetica",
-        "-stroke",
-        "white",
-        "-pointsize",
-        "40",
-        "-fill",
-        "#FFF",
-        "-gravity",
-        "northwest",
-        "-draw",
-        "roundRectangle 40,40,558,100 10,10",
-        "-strokewidth",
-        "2",
-        "-stroke",
-        "black",
-        "-fill",
-        "black",
-        "-annotate",
-        "+60+45",
-        iso,
-        snapshotPath,
-      ],
-    );
-  } catch (e) {
-    log.error(`Snapshot [${iso}] processing failed!`, e.message);
-  }
+  await executeWithLogging(
+    () => Deno.rename(paths.savePath(dateString), paths.scratchPath(iso)),
+    `Snapshot complete`,
+    `Error renaming save and scratch path`,
+  );
 
-  await Deno.rename(snapshotPath, savePath(dateString));
-
-  try {
-    log.info(`Syncing files with S3...`);
-
-    await run(
-      [
-        awsCmd,
-        "s3",
-        "sync",
-        `${WORK_DIR}/images/`,
-        awsBucket,
-        "--exclude",
-        "*",
-        "--include",
-        "*.jpg",
-      ],
-    );
-  } catch (e) {
-    log.error(`Syncing files with S3 failed!`, e.message);
-  }
-
-  await Deno.rename(savePath(dateString), scratchPath(iso));
-
-  log.info(`Snapshot complete: ${savePath(iso)}`);
-
-  try {
-    const ffmpegArgs = [
-      ffmpegCmd,
-      "-y", // Overwrite output files without asking
-      "-framerate",
-      "10", // Set frame rate
-      "-pattern_type",
-      "glob", // Use glob pattern for input file matching
-      "-i",
-      videoImagesPath, // Input files path - corrected without extra quotes
-      "-c:v",
-      "libx264", // Video codec
-      "-profile:v",
-      "high", // Encoder profile
-      "-crf",
-      "20", // Constant Rate Factor for quality
-      "-pix_fmt",
-      "yuv420p", // Pixel format
-      videoPath, // Output file path
-    ];
-
-    await run(ffmpegArgs);
-
-    log.info(`Timelapse video updated: ${videoPath}`);
-  } catch (e) {
-    log.error("Timelapse video updated failed!", e.message);
-  }
+  await executeWithLogging(
+    () => createTimeLapseVideo(run, paths.videoImagesPath, paths.videoPath),
+    `Time-lapse video updated: ${paths.videoPath}`,
+    `Time-lapse video update failed!`,
+  );
 };
 
 runCameraCapture();

@@ -1,6 +1,10 @@
 {
+  "imports": {
+    "run_simple": "https://deno.land/x/run_simple@2.3.0/mod.ts",
+    "@std/log": "https://deno.land/std@0.222.1/log/mod.ts"
+  },
   "tasks": {
-    "build": "deno compile --allow-run --allow-read --allow-write webcam.ts",
-    "run": "deno run --allow-run --allow-read --allow-write webcam.ts"
+    "build": "deno compile --env -ERW --allow-run webcam.ts",
+    "run": "deno run --env -ERW --allow-run webcam.ts"
   }
 }

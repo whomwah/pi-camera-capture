@@ -4,9 +4,9 @@ A Deno program that takes snapshots from a Raspberry Pi camera, uploads it to S3
 and then creates a time-lapse video with the results. Also has a script to take
 a live photo.
 
-- uses a [Raspberry Pi 4 Model
-  B](https://www.raspberrypi.com/products/raspberry-pi-4-model-b/) and [Camera
-  Module 3](https://www.raspberrypi.com/products/camera-module-3/)
+- uses a
+  [Raspberry Pi 4 Model B](https://www.raspberrypi.com/products/raspberry-pi-4-model-b/)
+  and [Camera Module 3](https://www.raspberrypi.com/products/camera-module-3/)
 - uses `libcamera-still` to create a snapshot
 - uses `convert` to annotate the snapshot with the current time
 - uses `s3` to upload the snapshot to S3

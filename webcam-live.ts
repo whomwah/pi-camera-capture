@@ -11,19 +11,19 @@ const runCameraCapture = async () => {
   const { iso } = getFormattedDate();
 
   await executeWithLogging(
-    () => takeSnapshot(run, paths.snapshotPath),
-    `Snapshot taken: ${paths.snapshotPath}`,
+    () => takeSnapshot(run, paths.liveshotPath),
+    `Snapshot taken: ${paths.liveshotPath}`,
     `Snapshot [${iso}] failed!`,
   );
 
   await executeWithLogging(
-    () => processSnapshot(run, paths.snapshotPath, iso),
-    `Snapshot processed: ${paths.snapshotPath}`,
+    () => processSnapshot(run, paths.liveshotPath, iso),
+    `Snapshot processed: ${paths.liveshotPath}`,
     `Snapshot [${iso}] processing failed!`,
   );
 
   await executeWithLogging(
-    () => Deno.rename(paths.snapshotPath, paths.savePath("live")),
+    () => Deno.rename(paths.liveshotPath, paths.savePath("live")),
     `Snapshot file renamed to "live"`,
     `Error renaming snapshot to save path`,
   );

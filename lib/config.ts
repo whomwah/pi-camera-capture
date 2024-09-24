@@ -11,6 +11,7 @@ export const paths = {
   backupDir: `${config.workingDir}/backup`,
   imagesDir: `${config.workingDir}/images`,
   snapshotPath: `${config.workingDir}/images/snapshot${config.fileExt}`,
+  liveshotPath: `${config.workingDir}/images/live${config.fileExt}`,
   videoImagesPath: `${config.workingDir}/backup/*${config.fileExt}`,
   videoPath:
     `${config.workingDir}/backup/${config.movieFileName}${config.movieFileExt}`,

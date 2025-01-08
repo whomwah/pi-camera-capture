@@ -17,9 +17,26 @@ upload it to S3, and optiontionally create a time-lapse video with the results.
 The idea is it runs via a cron job that runs at various times during the day.
 
 ```
-0 10 * * * /home/webcam/_dev/webcam/webcam >> /home/webcam/_dev/webcam/output.log 2>&1
-0 16 * * * /home/webcam/_dev/webcam/webcam >> /home/webcam/_dev/webcam/output.log 2>&1
-*/5 * * * * /home/webcam/_dev/webcam/webcam-live >> /home/webcam/_dev/webcam/output-live.log 2>&1
+0 10 * * * /home/webcam/_dev/webcam/webcam >> /var/log/webcam/webcam.log 2>&1
+0 16 * * * /home/webcam/_dev/webcam/webcam >> /var/log/webcam/webcam.log 2>&1
+*/5 * * * * /home/webcam/_dev/webcam/webcam-live >> /var/log/webcam/webcam-live.log 2>&1
+```
+
+You can use this logrotate configuration to keep the log files in check if you
+need.
+
+```
+# /var/logrotate.d/webcam
+
+/var/log/webcam/webcam.log /var/log/webcam/webcam-live.log {
+    daily
+    rotate 7
+    compress
+    delaycompress
+    missingok
+    notifempty
+    create 644 webcam webcam
+}
 ```
 
 You can though of course run it manually. Type `deno task` to see the available

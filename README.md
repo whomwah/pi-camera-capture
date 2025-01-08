@@ -3,21 +3,6 @@
 A collection of Deno programs that use a Raspberry Pi camera to take snapshots,
 upload it to S3, and optiontionally create a time-lapse video with the results.
 
-## webcam.ts
-
-1. Takes photo
-2. Adds a label
-3. Uploads to S3
-4. Optionally created TimeLapse movie
-
-## webcam-live.ts
-
-1. Takes photo
-2. Adds a label
-3. Uploads to S3 and replaces previous
-
-## webcam-live.ts
-
 - uses a
   [Raspberry Pi 4 Model B](https://www.raspberrypi.com/products/raspberry-pi-4-model-b/)
   and
@@ -40,6 +25,19 @@ The idea is it runs via a cron job that runs at various times during the day.
 You can though of course run it manually. Type `deno task` to see the available
 tasks it can run. There are 4. The `build` tasks create an executable file you
 can use with `cron` for ease.
+
+### webcam.ts
+
+1. Takes photo
+2. Adds a label
+3. Uploads to S3
+4. Optionally created TimeLapse movie
+
+### webcam-live.ts
+
+1. Takes photo
+2. Adds a label
+3. Uploads to S3 and replaces previous
 
 Currently running on a camera situated in the [Kyan office](https://kyan.com/)
 of the development of the StMarys Wharf project.

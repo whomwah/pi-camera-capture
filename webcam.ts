@@ -4,7 +4,7 @@ import { run } from "run_simple";
 import { takeSnapshot } from "./lib/snapshot.ts";
 import { processSnapshot } from "./lib/process.ts";
 import { syncSnapshot } from "./lib/sync.ts";
-import { createTimeLapseVideo } from "./lib/time-lapse.ts";
+// import { createTimeLapseVideo } from "./lib/time-lapse.ts";
 import { executeWithLogging, getFormattedDate } from "./lib/utils.ts";
 import { paths } from "./lib/config.ts";
 
@@ -41,11 +41,13 @@ const runCameraCapture = async () => {
     `Error renaming save and scratch path`,
   );
 
-  await executeWithLogging(
-    () => createTimeLapseVideo(run, paths.videoImagesPath, paths.videoPath),
-    `Time-lapse video updated: ${paths.videoPath}`,
-    `Time-lapse video update failed!`,
-  );
+  // Uncomment to create timelapse video on device
+  //
+  // await executeWithLogging(
+  //   () => createTimeLapseVideo(run, paths.videoImagesPath, paths.videoPath),
+  //   `Time-lapse video updated: ${paths.videoPath}`,
+  //   `Time-lapse video update failed!`,
+  // );
 };
 
 runCameraCapture();

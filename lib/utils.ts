@@ -29,7 +29,7 @@ export async function executeWithLogging(
     log.info(successMessage);
     return result;
   } catch (e) {
-    log.error(errorMessage, e.message);
+    log.error(errorMessage, (e as Error).message);
   }
 }
 
@@ -40,14 +40,42 @@ export async function executeWithLogging(
  * @returns {number} Shutter speed in microseconds (constrained between 100-100000)
  */
 export function calculateShutterSpeed(brightness: number, adjustment = 1.0) {
-  // Base calculation - inverse relationship between brightness and shutter
-  const baseShutter = (65535 / brightness) * 50000;
+  // Constants for easy tuning
+  const MAX_BRIGHTNESS = 65535; // Maximum brightness value from ImageMagick
+  const DARK_THRESHOLD_PCT = 30; // Percentage where dark adjustment begins (~19660)
+  const PITCH_BLACK_PCT = 0.6; // Percentage considered pitch black (~325)
+  const BASE_SHUTTER = 50000; // Base shutter speed in microseconds
+  const MIN_SHUTTER = 100; // Minimum shutter speed (1/10000s)
+  const MAX_SHUTTER = 5000000; // Maximum shutter speed (1/0.2s)
+  const DARK_SCALING_FACTOR = 5; // Controls exponential scaling in dark
 
-  // Apply adjustment factor
-  const adjustedShutter = baseShutter * adjustment;
+  // Convert to percentage (0-100) for easier threshold checks
+  const brightnessPercent = (brightness / MAX_BRIGHTNESS) * 100;
 
-  // Constrain between 100μs (1/10000s) and 200000μs (1/10s)
-  return Math.round(Math.min(Math.max(adjustedShutter, 100), 200000));
+  // Handle pitch black conditions
+  if (brightnessPercent <= PITCH_BLACK_PCT) {
+    return MAX_SHUTTER;
+  }
+
+  // Calculate dark multiplier
+  let darkMultiplier = 1.0;
+  if (brightnessPercent < DARK_THRESHOLD_PCT) {
+    darkMultiplier = Math.pow(
+      2,
+      (DARK_THRESHOLD_PCT - brightnessPercent) /
+        DARK_SCALING_FACTOR,
+    );
+  }
+
+  // Base calculation with inverse relationship between brightness and shutter
+  const baseShutter = (MAX_BRIGHTNESS / brightness) * BASE_SHUTTER;
+
+  // Apply both dark condition multiplier and user adjustment
+  const adjustedShutter = baseShutter * darkMultiplier * adjustment;
+
+  return Math.round(
+    Math.min(Math.max(adjustedShutter, MIN_SHUTTER), MAX_SHUTTER),
+  );
 }
 
 /**

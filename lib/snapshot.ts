@@ -1,17 +1,11 @@
 import { env } from "./utils.ts";
 
-/**
- * Takes a snapshot using the specified `run` function and saves it to the given `snapshotPath`.
- *
- * @param run - A function that takes an array of string arguments and returns a promise that resolves to a string.
- * @param snapshotPath - The path where the snapshot will be saved.
- * @returns A promise that resolves when the snapshot is taken.
- */
 export const takeSnapshot = async (
-  run: (args: string[]) => Promise<string>,
+  run: (cmd1: string[], cmd2?: string[]) => Promise<string>,
   snapshotPath: string,
+  shutterSpeed?: string,
 ) => {
-  await run([
+  const libcameraArgs = [
     env("SNAPSHOT_CMD"),
     "-o",
     snapshotPath,
@@ -20,7 +14,11 @@ export const takeSnapshot = async (
     "2664",
     "--height",
     "1980",
+    "--shutter",
+    shutterSpeed || "60000",
     "--gain",
-    "1.6",
-  ]);
+    "1.5",
+  ];
+
+  return await run(libcameraArgs);
 };

@@ -7,7 +7,7 @@ import { env } from "./utils.ts";
  * @returns A promise that resolves when the synchronization is complete.
  */
 export const syncSnapshot = async (
-  run: (args: string[]) => Promise<string>,
+  run: (cmd1: string[], cmd2?: string[]) => Promise<string>,
   imagePath: string,
 ) => {
   await run([

@@ -1,23 +1,35 @@
 #!/usr/bin/env -S deno run --allow-run --allow-read --allow-write
 
-import { run } from "run_simple";
 import { takeSnapshot } from "./lib/snapshot.ts";
 import { processSnapshot } from "./lib/process.ts";
 import { syncSnapshot } from "./lib/sync.ts";
-import { executeWithLogging, getFormattedDate } from "./lib/utils.ts";
+import {
+  executeWithLogging,
+  getFormattedDate,
+  runPipedCommands,
+} from "./lib/utils.ts";
 import { paths } from "./lib/config.ts";
+import { calcBrightness } from "./lib/brightness.ts";
 
 const runCameraCapture = async () => {
   const { iso } = getFormattedDate();
 
+  const results = await executeWithLogging(
+    () => calcBrightness(runPipedCommands, 1.0),
+    "Brightness found",
+    "Brightness check failed!",
+  ) as string;
+
+  const [brightness, shutterSpeed] = results.split(":");
+
   await executeWithLogging(
-    () => takeSnapshot(run, paths.liveshotPath),
-    `Snapshot taken: ${paths.liveshotPath}`,
+    () => takeSnapshot(runPipedCommands, paths.liveshotPath, shutterSpeed),
+    `Snapshot taken: ${paths.liveshotPath} with --shutter ${shutterSpeed} for brightness ${brightness}`,
     `Snapshot [${iso}] failed!`,
   );
 
   await executeWithLogging(
-    () => processSnapshot(run, paths.liveshotPath, iso),
+    () => processSnapshot(runPipedCommands, paths.liveshotPath, iso),
     `Snapshot processed: ${paths.liveshotPath}`,
     `Snapshot [${iso}] processing failed!`,
   );
@@ -29,7 +41,7 @@ const runCameraCapture = async () => {
   );
 
   await executeWithLogging(
-    () => syncSnapshot(run, paths.imagesDir),
+    () => syncSnapshot(runPipedCommands, paths.imagesDir),
     `Files synced with S3`,
     `Error syncing with S3`,
   );

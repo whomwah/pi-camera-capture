@@ -1,12 +1,12 @@
 {
   "imports": {
-    "run_simple": "https://deno.land/x/run_simple@2.3.0/mod.ts",
     "@std/log": "https://deno.land/std@0.222.1/log/mod.ts"
   },
   "tasks": {
     "build": "deno compile --env -ERW --allow-run webcam.ts",
     "build-live": "deno compile --env -ERW --allow-run webcam-live.ts",
     "run": "deno run --env -ERW --allow-run webcam.ts",
-    "live": "deno run --env -ERW --allow-run webcam-live.ts"
+    "live": "deno run --env -ERW --allow-run webcam-live.ts",
+    "brightness": "deno run --env -ERW --allow-run webcam-brightness.ts"
   }
 }

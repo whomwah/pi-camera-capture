@@ -19,23 +19,79 @@ export const getFormattedDate = () => {
   return { dateString: iso.slice(0, 10), iso };
 };
 
-/**
- * Executes a given action with logging and handles any errors that occur.
- *
- * @param action - The action to be executed.
- * @param successMessage - The success message to be logged if the action is successful.
- * @param errorMessage - The error message to be logged if the action fails.
- * @returns A promise that resolves when the action is completed.
- */
 export async function executeWithLogging(
-  action: () => Promise<void>,
+  action: () => Promise<string | void>,
   successMessage: string,
   errorMessage: string,
 ) {
   try {
-    await action();
+    const result = await action();
     log.info(successMessage);
+    return result;
   } catch (e) {
     log.error(errorMessage, e.message);
+  }
+}
+
+/**
+ * Calculates optimal shutter speed based on measured brightness
+ * @param {number} brightness - The measured brightness value from imagemagick
+ * @param {number} adjustment - Adjustment factor (default 1.0, higher = brighter)
+ * @returns {number} Shutter speed in microseconds (constrained between 100-100000)
+ */
+export function calculateShutterSpeed(brightness: number, adjustment = 1.0) {
+  // Base calculation - inverse relationship between brightness and shutter
+  const baseShutter = (65535 / brightness) * 50000;
+
+  // Apply adjustment factor
+  const adjustedShutter = baseShutter * adjustment;
+
+  // Constrain between 100μs (1/10000s) and 200000μs (1/10s)
+  return Math.round(Math.min(Math.max(adjustedShutter, 100), 200000));
+}
+
+/**
+ * Executes two commands in a piped manner, where the output of the first command
+ * is used as the input for the second command. If the second command is not provided,
+ * it simply returns the output of the first command.
+ *
+ * @param cmd1 - The first command to execute, represented as an array of strings where the first element is the command and the rest are the arguments.
+ * @param cmd2 - (Optional) The second command to execute, represented as an array of strings where the first element is the command and the rest are the arguments.
+ * @returns A promise that resolves to the final output of the executed commands as a string.
+ */
+export async function runPipedCommands(
+  cmd1: string[],
+  cmd2?: string[],
+): Promise<string> {
+  // Create first process that writes to stdout
+  const p1 = new Deno.Command(cmd1[0], {
+    args: cmd1.slice(1),
+    stdout: "piped",
+  });
+
+  // Start the first process
+  const proc1 = p1.spawn();
+
+  if (cmd2) {
+    // Create second process that reads from stdin
+    const p2 = new Deno.Command(cmd2[0], {
+      args: cmd2.slice(1),
+      stdin: "piped",
+      stdout: "piped",
+    });
+
+    // Start the second process
+    const proc2 = p2.spawn();
+
+    // Pipe output from proc1 to proc2
+    await proc1.stdout.pipeTo(proc2.stdin);
+
+    // Get final output from proc2
+    const { stdout } = await proc2.output();
+    return new TextDecoder().decode(stdout);
+  } else {
+    // Get final output from proc1 if cmd2 is not provided
+    const { stdout } = await proc1.output();
+    return new TextDecoder().decode(stdout);
   }
 }

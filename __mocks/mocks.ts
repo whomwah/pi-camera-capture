@@ -1,9 +1,8 @@
-import * as Simple from "run_simple";
 import { spy } from "jsr:@std/testing/mock";
 
 export const mockRun = spy(
   async (
-    command: string | Simple.SimpleValue[],
-    _options?: Simple.RunOptions,
-  ) => await (command as string[]).join(""),
+    cmd1: string[],
+    cmd2?: string[],
+  ) => await [...cmd1, ...(cmd2 ?? [])].join(""),
 );

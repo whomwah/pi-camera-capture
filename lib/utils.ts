@@ -19,22 +19,15 @@ export const getFormattedDate = () => {
   return { dateString: iso.slice(0, 10), iso };
 };
 
-/**
- * Executes a given action with logging and handles any errors that occur.
- *
- * @param action - The action to be executed.
- * @param successMessage - The success message to be logged if the action is successful.
- * @param errorMessage - The error message to be logged if the action fails.
- * @returns A promise that resolves when the action is completed.
- */
 export async function executeWithLogging(
-  action: () => Promise<void>,
+  action: () => Promise<string | void>,
   successMessage: string,
   errorMessage: string,
 ) {
   try {
-    await action();
+    const result = await action();
     log.info(successMessage);
+    return result;
   } catch (e) {
     log.error(errorMessage, e.message);
   }

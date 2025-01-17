@@ -1,5 +1,5 @@
 import { assertEquals } from "jsr:@std/assert";
-import { env, getFormattedDate } from "./utils.ts";
+import { calculateShutterSpeed, env, getFormattedDate } from "./utils.ts";
 
 Deno.test("getFormattedDate returns correct dateString and iso", () => {
   // Save the original Date constructor
@@ -47,4 +47,15 @@ Deno.test("env returns the correct environment variable value", () => {
     // Restore the original Deno.env.get
     Deno.env.get = originalEnvGet;
   }
+});
+
+Deno.test("calculateShutterSpeed", () => {
+  // the results in the assertions is the value passed to --shutter
+  assertEquals(calculateShutterSpeed(89285.1), 36700);
+  assertEquals(calculateShutterSpeed(59285.1), 55271);
+  assertEquals(calculateShutterSpeed(49285.1), 66486);
+  assertEquals(calculateShutterSpeed(29285.1), 111891);
+  assertEquals(calculateShutterSpeed(29206.5), 112192);
+  assertEquals(calculateShutterSpeed(29149.4), 112412);
+  assertEquals(calculateShutterSpeed(1234.3), 200000);
 });

@@ -1,6 +1,5 @@
 {
   "imports": {
-    "run_simple": "https://deno.land/x/run_simple@2.3.0/mod.ts",
     "@std/log": "https://deno.land/std@0.222.1/log/mod.ts"
   },
   "tasks": {

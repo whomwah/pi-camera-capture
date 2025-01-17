@@ -1,29 +1,35 @@
 import { assertSpyCall, assertSpyCalls, stub } from "jsr:@std/testing/mock";
-import { takeSnapshot } from "./snapshot.ts";
+import { calcBrightness } from "./brightness.ts";
 import { mockRun } from "../__mocks/mocks.ts";
 
 Deno.test("takeSnapshot calls run with correct arguments", async () => {
-  const snapshotPath = "/path/to/snapshot.jpg";
   const mockEnv = stub(Deno.env, "get", () => "snapshot");
 
-  await takeSnapshot(mockRun, snapshotPath);
+  await calcBrightness(mockRun, 0.5);
 
   assertSpyCalls(mockRun, 1);
   assertSpyCall(mockRun, 0, {
     args: [
       [
         "snapshot",
-        "-o",
-        snapshotPath,
         "--immediate",
         "--width",
-        "2664",
+        "800",
         "--height",
-        "1980",
+        "600",
         "--shutter",
-        "60000",
-        "--gain",
-        "1.5",
+        "50000",
+        "-o",
+        "-",
+      ],
+      [
+        "snapshot",
+        "jpeg:-",
+        "-colorspace",
+        "Gray",
+        "-format",
+        "%[fx:quantumrange*mean]",
+        "info:",
       ],
     ],
   });

@@ -9,7 +9,7 @@ import { env } from "./utils.ts";
  * @returns A Promise that resolves when the snapshot processing is complete.
  */
 export const processSnapshot = async (
-  run: (args: string[]) => Promise<string>,
+  run: (cmd1: string[], cmd2?: string[]) => Promise<string>,
   snapshotPath: string,
   iso: string,
 ) => {

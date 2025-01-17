@@ -1,7 +1,7 @@
 import { env } from "./utils.ts";
 
 export const createTimeLapseVideo = async (
-  run: (args: string[]) => Promise<string>,
+  run: (cmd1: string[], cmd2?: string[]) => Promise<string>,
   videoImagesPath: string,
   videoPath: string,
 ) => {

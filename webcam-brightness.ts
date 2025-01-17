@@ -1,20 +1,21 @@
 #!/usr/bin/env -S deno run --allow-run --allow-read --allow-write
 
-import { run } from "run_simple";
 import { calcBrightness } from "./lib/brightness.ts";
 import { takeSnapshot } from "./lib/snapshot.ts";
-import { executeWithLogging } from "./lib/utils.ts";
+import { executeWithLogging, runPipedCommands } from "./lib/utils.ts";
 
 const runCheck = async () => {
-  const shutterSpeed = await executeWithLogging(
-    () => calcBrightness(0.7),
+  const results = await executeWithLogging(
+    () => calcBrightness(runPipedCommands, 1.0),
     "Brightness found",
     "Brightness check failed!",
   ) as string;
 
+  const [brightness, shutterSpeed] = results.split(":");
+
   await executeWithLogging(
-    () => takeSnapshot(run, "brightness.jpg", shutterSpeed),
-    `Snapshot taken with --shutter ${shutterSpeed}`,
+    () => takeSnapshot(runPipedCommands, "brightness.jpg", shutterSpeed),
+    `Snapshot taken with --shutter ${shutterSpeed} for brightness ${brightness}`,
     "Brightness check failed!",
   );
 };

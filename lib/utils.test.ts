@@ -50,6 +50,9 @@ Deno.test("env returns the correct environment variable value", () => {
 });
 
 Deno.test("calculateShutterSpeed comprehensive tests", () => {
+  assertEquals(calculateShutterSpeed(80000, 0.8), 30000);
+  assertEquals(calculateShutterSpeed(70000, 0.8), 30000);
+  assertEquals(calculateShutterSpeed(60000, 0.8), 33333);
   assertEquals(calculateShutterSpeed(50000, 0.8), 40000);
   assertEquals(calculateShutterSpeed(40000, 0.8), 50000);
   assertEquals(calculateShutterSpeed(30000, 0.8), 66667);
@@ -57,5 +60,7 @@ Deno.test("calculateShutterSpeed comprehensive tests", () => {
   assertEquals(calculateShutterSpeed(10000, 0.8), 200000);
   assertEquals(calculateShutterSpeed(5000, 0.8), 400000);
   assertEquals(calculateShutterSpeed(1000, 0.8), 3482202);
+  assertEquals(calculateShutterSpeed(750, 0.8), 4806669);
+  assertEquals(calculateShutterSpeed(500, 0.8), 5000000);
   assertEquals(calculateShutterSpeed(325, 0.8), 5000000);
 });

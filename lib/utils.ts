@@ -34,19 +34,39 @@ export async function executeWithLogging(
 }
 
 /**
- * Calculates optimal shutter speed based on measured brightness
- * @param {number} brightness - The measured brightness value from imagemagick
- * @param {number} adjustment - Adjustment factor (default 1.0, higher = brighter)
- * @returns {number} Shutter speed in microseconds (constrained between 100-100000)
+ * Calculates the appropriate shutter speed based on the given brightness and adjustment factor.
+ *
+ * The function adjusts the shutter speed inversely proportional to the brightness.
+ * It also applies an additional multiplier if the brightness is below a certain threshold,
+ * simulating an exponential increase in shutter speed for very dark conditions.
+ *
+ * @param {number} brightness - The brightness value, typically obtained from an image processing tool like ImageMagick.
+ * @param {number} [adjustment=1.0] - An optional adjustment factor to fine-tune the shutter speed.
+ * @returns {number} - The calculated shutter speed, constrained between the minimum and maximum allowable values.
+ *
+ * Constants:
+ * - MAX_BRIGHTNESS: The maximum brightness value expected from the input.
+ * - DARK_THRESHOLD_PCT: The brightness percentage below which dark adjustment begins.
+ * - BASE_SHUTTER: The base shutter speed used in the calculation.
+ * - MIN_SHUTTER: The minimum allowable shutter speed.
+ * - MAX_SHUTTER: The maximum allowable shutter speed.
+ * - DARK_SCALING_FACTOR: Controls the exponential scaling factor for dark conditions.
+ *
+ * The calculation steps are as follows:
+ * 1. Convert the brightness to a percentage of MAX_BRIGHTNESS.
+ * 2. Determine the dark multiplier if the brightness is below DARK_THRESHOLD_PCT.
+ * 3. Calculate the base shutter speed inversely proportional to the brightness.
+ * 4. Apply the dark multiplier and user adjustment to the base shutter speed.
+ * 5. Constrain the final shutter speed between MIN_SHUTTER and MAX_SHUTTER.
  */
 export function calculateShutterSpeed(brightness: number, adjustment = 1.0) {
   // Constants for easy tuning
-  const MAX_BRIGHTNESS = 50000; // Maximum brightness value from ImageMagick
-  const DARK_THRESHOLD_PCT = 10; // Percentage where dark adjustment begins (~19660)
-  const BASE_SHUTTER = 50000; // Base shutter speed in microseconds
-  const MIN_SHUTTER = 100; // Minimum shutter speed (1/10000s)
-  const MAX_SHUTTER = 5000000; // Maximum shutter speed (1/0.2s)
-  const DARK_SCALING_FACTOR = 10; // Controls exponential scaling in dark
+  const MAX_BRIGHTNESS = 50000;
+  const DARK_THRESHOLD_PCT = 10;
+  const BASE_SHUTTER = 50000;
+  const MIN_SHUTTER = 30000;
+  const MAX_SHUTTER = 5000000;
+  const DARK_SCALING_FACTOR = 10;
 
   // Convert to percentage (0-100) for easier threshold checks
   const brightnessPercent = (brightness / MAX_BRIGHTNESS) * 100;

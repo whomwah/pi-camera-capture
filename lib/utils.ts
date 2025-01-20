@@ -41,21 +41,15 @@ export async function executeWithLogging(
  */
 export function calculateShutterSpeed(brightness: number, adjustment = 1.0) {
   // Constants for easy tuning
-  const MAX_BRIGHTNESS = 65535; // Maximum brightness value from ImageMagick
-  const DARK_THRESHOLD_PCT = 30; // Percentage where dark adjustment begins (~19660)
-  const PITCH_BLACK_PCT = 0.6; // Percentage considered pitch black (~325)
+  const MAX_BRIGHTNESS = 50000; // Maximum brightness value from ImageMagick
+  const DARK_THRESHOLD_PCT = 10; // Percentage where dark adjustment begins (~19660)
   const BASE_SHUTTER = 50000; // Base shutter speed in microseconds
   const MIN_SHUTTER = 100; // Minimum shutter speed (1/10000s)
   const MAX_SHUTTER = 5000000; // Maximum shutter speed (1/0.2s)
-  const DARK_SCALING_FACTOR = 5; // Controls exponential scaling in dark
+  const DARK_SCALING_FACTOR = 10; // Controls exponential scaling in dark
 
   // Convert to percentage (0-100) for easier threshold checks
   const brightnessPercent = (brightness / MAX_BRIGHTNESS) * 100;
-
-  // Handle pitch black conditions
-  if (brightnessPercent <= PITCH_BLACK_PCT) {
-    return MAX_SHUTTER;
-  }
 
   // Calculate dark multiplier
   let darkMultiplier = 1.0;

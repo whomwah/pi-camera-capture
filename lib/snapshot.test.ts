@@ -22,8 +22,6 @@ Deno.test("takeSnapshot calls run with correct arguments", async () => {
         "1980",
         "--shutter",
         "60000",
-        "--gain",
-        "1.5",
       ],
     ],
   });

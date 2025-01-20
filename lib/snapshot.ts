@@ -16,8 +16,6 @@ export const takeSnapshot = async (
     "1980",
     "--shutter",
     shutterSpeed || "60000",
-    "--gain",
-    "1.5",
   ];
 
   return await run(libcameraArgs);

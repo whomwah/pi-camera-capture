@@ -7,6 +7,7 @@
     "build-live": "deno compile --env -ERW --allow-run webcam-live.ts",
     "run": "deno run --env -ERW --allow-run webcam.ts",
     "live": "deno run --env -ERW --allow-run webcam-live.ts",
-    "brightness": "deno run --env -ERW --allow-run webcam-brightness.ts"
+    "brightness": "deno run --env -ERW --allow-run webcam-brightness.ts",
+    "graph": "deno run --allow-write graph/generate-curve.ts > graph/data.csv"
   }
 }

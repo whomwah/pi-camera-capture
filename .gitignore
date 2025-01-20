@@ -6,3 +6,4 @@ webcam
 webcam-live
 .env
 brightness.jpg
+graph/epoch_data.json

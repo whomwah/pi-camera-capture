@@ -1,5 +1,11 @@
 import { assertEquals } from "jsr:@std/assert";
-import { calculateShutterSpeed, env, getFormattedDate } from "./utils.ts";
+import {
+  calculateShutterSpeed,
+  env,
+  getFormattedDate,
+  MAX_BRIGHTNESS,
+  MIN_BRIGHTNESS,
+} from "./utils.ts";
 
 Deno.test("getFormattedDate returns correct dateString and iso", () => {
   // Save the original Date constructor
@@ -50,17 +56,21 @@ Deno.test("env returns the correct environment variable value", () => {
 });
 
 Deno.test("calculateShutterSpeed comprehensive tests", () => {
-  assertEquals(calculateShutterSpeed(80000, 0.8), 30000);
-  assertEquals(calculateShutterSpeed(70000, 0.8), 30000);
-  assertEquals(calculateShutterSpeed(60000, 0.8), 33333);
-  assertEquals(calculateShutterSpeed(50000, 0.8), 40000);
-  assertEquals(calculateShutterSpeed(40000, 0.8), 50000);
-  assertEquals(calculateShutterSpeed(30000, 0.8), 66667);
-  assertEquals(calculateShutterSpeed(20000, 0.8), 100000);
-  assertEquals(calculateShutterSpeed(10000, 0.8), 200000);
-  assertEquals(calculateShutterSpeed(5000, 0.8), 400000);
-  assertEquals(calculateShutterSpeed(1000, 0.8), 3482202);
-  assertEquals(calculateShutterSpeed(750, 0.8), 4806669);
-  assertEquals(calculateShutterSpeed(500, 0.8), 5000000);
-  assertEquals(calculateShutterSpeed(325, 0.8), 5000000);
+  assertEquals(calculateShutterSpeed(MAX_BRIGHTNESS), 20833);
+  assertEquals(calculateShutterSpeed(50000), 31887);
+  assertEquals(calculateShutterSpeed(40000), 65000);
+  assertEquals(calculateShutterSpeed(30000), 86667);
+  assertEquals(calculateShutterSpeed(25000), 104000);
+  assertEquals(calculateShutterSpeed(24000), 108333);
+  assertEquals(calculateShutterSpeed(23000), 113043);
+  assertEquals(calculateShutterSpeed(22000), 118182);
+  assertEquals(calculateShutterSpeed(21000), 123810);
+  assertEquals(calculateShutterSpeed(20000), 130000);
+  assertEquals(calculateShutterSpeed(10000), 260000);
+  assertEquals(calculateShutterSpeed(5000), 520000);
+  assertEquals(calculateShutterSpeed(1000), 2605600);
+  assertEquals(calculateShutterSpeed(750), 3477467);
+  assertEquals(calculateShutterSpeed(500), 5221200);
+  assertEquals(calculateShutterSpeed(450), 5802444);
+  assertEquals(calculateShutterSpeed(MIN_BRIGHTNESS), 6000000);
 });

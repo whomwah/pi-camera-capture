@@ -19,6 +19,14 @@ export const getFormattedDate = () => {
   return { dateString: iso.slice(0, 10), iso };
 };
 
+/**
+ * Executes a given asynchronous action and logs the result.
+ *
+ * @param action - The asynchronous action to be executed. It should return a Promise that resolves to a string or void.
+ * @param successMessage - The message to log if the action is successful.
+ * @param errorMessage - The message to log if the action fails.
+ * @returns A Promise that resolves to the result of the action if successful, otherwise undefined.
+ */
 export async function executeWithLogging(
   action: () => Promise<string | void>,
   successMessage: string,
@@ -33,60 +41,49 @@ export async function executeWithLogging(
   }
 }
 
-/**
- * Calculates the appropriate shutter speed based on the given brightness and adjustment factor.
- *
- * The function adjusts the shutter speed inversely proportional to the brightness.
- * It also applies an additional multiplier if the brightness is below a certain threshold,
- * simulating an exponential increase in shutter speed for very dark conditions.
- *
- * @param {number} brightness - The brightness value, typically obtained from an image processing tool like ImageMagick.
- * @param {number} [adjustment=1.0] - An optional adjustment factor to fine-tune the shutter speed.
- * @returns {number} - The calculated shutter speed, constrained between the minimum and maximum allowable values.
- *
- * Constants:
- * - MAX_BRIGHTNESS: The maximum brightness value expected from the input.
- * - DARK_THRESHOLD_PCT: The brightness percentage below which dark adjustment begins.
- * - BASE_SHUTTER: The base shutter speed used in the calculation.
- * - MIN_SHUTTER: The minimum allowable shutter speed.
- * - MAX_SHUTTER: The maximum allowable shutter speed.
- * - DARK_SCALING_FACTOR: Controls the exponential scaling factor for dark conditions.
- *
- * The calculation steps are as follows:
- * 1. Convert the brightness to a percentage of MAX_BRIGHTNESS.
- * 2. Determine the dark multiplier if the brightness is below DARK_THRESHOLD_PCT.
- * 3. Calculate the base shutter speed inversely proportional to the brightness.
- * 4. Apply the dark multiplier and user adjustment to the base shutter speed.
- * 5. Constrain the final shutter speed between MIN_SHUTTER and MAX_SHUTTER.
- */
+// Constants for easy tuning
+export const MIN_SHUTTER = 10000;
+export const MAX_SHUTTER = 6000000;
+export const MIN_BRIGHTNESS = 435;
+export const MAX_BRIGHTNESS = 52000;
+const BASE_SHUTTER = 50000;
+const DARK_SCALING_FACTOR = 500;
+const DARK_THRESHOLD_PCT = 3;
+const LIGHT_THRESHOLD_PCT = 93;
+const BRIGHT_SCALING_FACTOR = 5;
+
 export function calculateShutterSpeed(brightness: number, adjustment = 1.0) {
-  // Constants for easy tuning
-  const MAX_BRIGHTNESS = 50000;
-  const DARK_THRESHOLD_PCT = 10;
-  const BASE_SHUTTER = 50000;
-  const MIN_SHUTTER = 30000;
-  const MAX_SHUTTER = 5000000;
-  const DARK_SCALING_FACTOR = 10;
-
-  // Convert to percentage (0-100) for easier threshold checks
-  const brightnessPercent = (brightness / MAX_BRIGHTNESS) * 100;
-
-  // Calculate dark multiplier
-  let darkMultiplier = 1.0;
-  if (brightnessPercent < DARK_THRESHOLD_PCT) {
-    darkMultiplier = Math.pow(
-      2,
-      (DARK_THRESHOLD_PCT - brightnessPercent) /
-        DARK_SCALING_FACTOR,
-    );
+  // Ensure brightness is not below min
+  if (brightness < MIN_BRIGHTNESS) {
+    brightness = MIN_BRIGHTNESS;
   }
 
-  // Base calculation with inverse relationship between brightness and shutter
+  // Convert to percentage for thresholds
+  const brightnessPercent = (brightness / MAX_BRIGHTNESS) * 100;
+
+  // Gradual dark multiplier
+  let darkMultiplier = 1.0;
+  if (brightnessPercent < DARK_THRESHOLD_PCT) {
+    darkMultiplier = 1 +
+      (DARK_THRESHOLD_PCT - brightnessPercent) / DARK_SCALING_FACTOR;
+  }
+
+  // Gradual light multiplier
+  let brightMultiplier = 1.0;
+  if (brightnessPercent > LIGHT_THRESHOLD_PCT) {
+    brightMultiplier = 1 +
+      (brightnessPercent - LIGHT_THRESHOLD_PCT) / BRIGHT_SCALING_FACTOR;
+  }
+
+  // Base calculation
   const baseShutter = (MAX_BRIGHTNESS / brightness) * BASE_SHUTTER;
 
-  // Apply both dark condition multiplier and user adjustment
-  const adjustedShutter = baseShutter * darkMultiplier * adjustment;
+  // Apply multipliers and adjustment
+  // Dark multiplier raises shutter, bright lowers it
+  const adjustedShutter = (baseShutter * darkMultiplier * adjustment) /
+    brightMultiplier;
 
+  // Constrain within limits
   return Math.round(
     Math.min(Math.max(adjustedShutter, MIN_SHUTTER), MAX_SHUTTER),
   );
@@ -129,11 +126,26 @@ export async function runPipedCommands(
     await proc1.stdout.pipeTo(proc2.stdin);
 
     // Get final output from proc2
-    const { stdout } = await proc2.output();
+    return decodeProcessOutput(proc2);
+  }
+
+  // Get final output from proc1 if cmd2 is not provided
+  return decodeProcessOutput(proc1);
+}
+
+/**
+ * Decodes the output of a given Deno child process.
+ *
+ * @param proc - The Deno child process whose output needs to be decoded.
+ * @returns A promise that resolves to the decoded output as a string.
+ */
+async function decodeProcessOutput(proc: Deno.ChildProcess): Promise<string> {
+  try {
+    const { stdout } = await proc.output();
     return new TextDecoder().decode(stdout);
-  } else {
-    // Get final output from proc1 if cmd2 is not provided
-    const { stdout } = await proc1.output();
-    return new TextDecoder().decode(stdout);
+  } catch (error) {
+    throw new Error(
+      `Process output decode failed: ${(error as Error).message}`,
+    );
   }
 }

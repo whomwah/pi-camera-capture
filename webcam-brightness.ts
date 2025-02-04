@@ -6,7 +6,7 @@ import { executeWithLogging, runPipedCommands } from "./lib/utils.ts";
 
 const runCheck = async () => {
   const results = await executeWithLogging(
-    () => calcBrightness(runPipedCommands, 0.8),
+    () => calcBrightness(runPipedCommands, 1.0),
     "Brightness found",
     "Brightness check failed!",
   ) as string;

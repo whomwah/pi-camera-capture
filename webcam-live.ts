@@ -28,7 +28,7 @@ const runCameraCapture = async () => {
         run: runPipedCommands,
         snapshotPath: paths.liveshotPath,
         shutterSpeed,
-        quality: "50",
+        quality: "60",
       }),
     `Snapshot taken: ${paths.liveshotPath} with --shutter ${shutterSpeed} for brightness ${brightness}`,
     `Snapshot [${iso}] failed!`,

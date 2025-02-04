@@ -1,4 +1,8 @@
-import { calculateShutterSpeed, MAX_BRIGHTNESS, MIN_BRIGHTNESS } from "../lib/utils.ts";
+import {
+  calculateShutterSpeed,
+  MAX_BRIGHTNESS,
+  MIN_BRIGHTNESS,
+} from "../lib/utils.ts";
 
 export function generateData() {
   const points: [number, number][] = [];

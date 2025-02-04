@@ -1,5 +1,11 @@
 import { assertEquals } from "jsr:@std/assert";
-import { calculateShutterSpeed, env, getFormattedDate, MAX_BRIGHTNESS, MIN_BRIGHTNESS } from "./utils.ts";
+import {
+  calculateShutterSpeed,
+  env,
+  getFormattedDate,
+  MAX_BRIGHTNESS,
+  MIN_BRIGHTNESS,
+} from "./utils.ts";
 
 Deno.test("getFormattedDate returns correct dateString and iso", () => {
   // Save the original Date constructor

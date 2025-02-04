@@ -1,6 +1,11 @@
 import * as tf from "npm:@tensorflow/tfjs@^4.22.0";
 import { parse } from "jsr:@std/csv";
-import { MAX_BRIGHTNESS, MAX_SHUTTER, MIN_BRIGHTNESS, MIN_SHUTTER } from "../lib/utils.ts";
+import {
+  MAX_BRIGHTNESS,
+  MAX_SHUTTER,
+  MIN_BRIGHTNESS,
+  MIN_SHUTTER,
+} from "../lib/utils.ts";
 
 function normalizeLinear(value: number, min: number, max: number): number {
   return (value - min) / (max - min);

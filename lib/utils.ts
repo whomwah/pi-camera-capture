@@ -64,15 +64,15 @@ export function calculateShutterSpeed(brightness: number, adjustment = 1.0) {
   // Gradual dark multiplier
   let darkMultiplier = 1.0;
   if (brightnessPercent < DARK_THRESHOLD_PCT) {
-    darkMultiplier =
-      1 + (DARK_THRESHOLD_PCT - brightnessPercent) / DARK_SCALING_FACTOR;
+    darkMultiplier = 1 +
+      (DARK_THRESHOLD_PCT - brightnessPercent) / DARK_SCALING_FACTOR;
   }
 
   // Gradual light multiplier
   let brightMultiplier = 1.0;
   if (brightnessPercent > LIGHT_THRESHOLD_PCT) {
-    brightMultiplier =
-      1 + (brightnessPercent - LIGHT_THRESHOLD_PCT) / BRIGHT_SCALING_FACTOR;
+    brightMultiplier = 1 +
+      (brightnessPercent - LIGHT_THRESHOLD_PCT) / BRIGHT_SCALING_FACTOR;
   }
 
   // Base calculation
@@ -80,12 +80,12 @@ export function calculateShutterSpeed(brightness: number, adjustment = 1.0) {
 
   // Apply multipliers and adjustment
   // Dark multiplier raises shutter, bright lowers it
-  const adjustedShutter =
-    (baseShutter * darkMultiplier * adjustment) / brightMultiplier;
+  const adjustedShutter = (baseShutter * darkMultiplier * adjustment) /
+    brightMultiplier;
 
   // Constrain within limits
   return Math.round(
-    Math.min(Math.max(adjustedShutter, MIN_SHUTTER), MAX_SHUTTER)
+    Math.min(Math.max(adjustedShutter, MIN_SHUTTER), MAX_SHUTTER),
   );
 }
 

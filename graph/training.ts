@@ -141,7 +141,7 @@ async function trainModel(
     callbacks: [
       earlyStoppingCallback,
       new tf.CustomCallback({
-        onEpochEnd: (epoch: any, logs: any) => {
+        onEpochEnd: (epoch: number, logs?: tf.Logs) => {
           if (logs && logs.val_loss < bestValidationLoss) {
             bestValidationLoss = logs.val_loss;
             bestModelWeights = model.getWeights();

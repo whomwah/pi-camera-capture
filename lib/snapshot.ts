@@ -1,22 +1,27 @@
 import { env } from "./utils.ts";
 
-export const takeSnapshot = async (
-  run: (cmd1: string[], cmd2?: string[]) => Promise<string>,
-  snapshotPath: string,
-  shutterSpeed?: string,
-) => {
+interface SnapShot {
+  run: (cmd1: string[], cmd2?: string[]) => Promise<string>;
+  snapshotPath: string;
+  shutterSpeed?: string;
+  quality?: string;
+}
+
+export const takeSnapshot = async (params: SnapShot) => {
   const libcameraArgs = [
     env("SNAPSHOT_CMD"),
     "-o",
-    snapshotPath,
+    params.snapshotPath,
     "--immediate",
     "--width",
     "2664",
     "--height",
     "1980",
+    "--quality",
+    params.quality || "93",
     "--shutter",
-    shutterSpeed || "60000",
+    params.shutterSpeed || "60000",
   ];
 
-  return await run(libcameraArgs);
+  return await params.run(libcameraArgs);
 };

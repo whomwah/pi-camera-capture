@@ -15,16 +15,21 @@ import { calcBrightness } from "./lib/brightness.ts";
 const runCameraCapture = async () => {
   const { iso } = getFormattedDate();
 
-  const results = await executeWithLogging(
+  const results = (await executeWithLogging(
     () => calcBrightness(runPipedCommands, 1.0),
     "Brightness found",
     "Brightness check failed!",
-  ) as string;
+  )) as string;
 
   const [brightness, shutterSpeed] = results.split(":");
 
   await executeWithLogging(
-    () => takeSnapshot(runPipedCommands, paths.snapshotPath, shutterSpeed),
+    () =>
+      takeSnapshot({
+        run: runPipedCommands,
+        snapshotPath: paths.snapshotPath,
+        shutterSpeed,
+      }),
     `Snapshot taken: ${paths.snapshotPath} with --shutter ${shutterSpeed} for brightness ${brightness}`,
     `Snapshot [${iso}] failed!`,
   );

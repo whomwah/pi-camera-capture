@@ -16,7 +16,7 @@ const runCameraCapture = async () => {
   const { iso } = getFormattedDate();
 
   const results = (await executeWithLogging(
-    () => calcBrightness(runPipedCommands, 1.0),
+    () => calcBrightness({ run: runPipedCommands, brightness: 1.0 }),
     "Brightness found",
     "Brightness check failed!",
   )) as string;
@@ -35,7 +35,12 @@ const runCameraCapture = async () => {
   );
 
   await executeWithLogging(
-    () => processSnapshot(runPipedCommands, paths.snapshotPath, iso),
+    () =>
+      processSnapshot({
+        run: runPipedCommands,
+        snapshotPath: paths.snapshotPath,
+        iso,
+      }),
     `Snapshot processed: ${paths.snapshotPath}`,
     `Snapshot [${iso}] processing failed!`,
   );
@@ -47,7 +52,7 @@ const runCameraCapture = async () => {
   );
 
   await executeWithLogging(
-    () => syncSnapshot(runPipedCommands, paths.imagesDir),
+    () => syncSnapshot({ run: runPipedCommands, imagePath: paths.imagesDir }),
     `Files synced with S3`,
     `Error syncing with S3`,
   );

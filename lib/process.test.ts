@@ -7,11 +7,11 @@ Deno.test("processSnapshot calls run with correct arguments", async () => {
   const mockEnv = stub(Deno.env, "get", () => "convert");
   const isoString = "2011-10-05T14:48:00.000Z";
 
-  await processSnapshot(
-    mockRun,
+  await processSnapshot({
+    run: mockRun,
     snapshotPath,
-    isoString,
-  );
+    iso: isoString,
+  });
 
   assertSpyCalls(mockRun, 1);
   assertSpyCall(mockRun, 0, {

@@ -1,21 +1,25 @@
 import { env } from "./utils.ts";
 
+interface ProcessSnapshot {
+  run: (cmd1: string[], cmd2?: string[]) => Promise<string>;
+  snapshotPath: string;
+  iso: string;
+}
+
 /**
- * Processes a snapshot by running a command with the provided arguments.
+ * Processes a snapshot by running a series of image manipulation commands.
  *
- * @param run - The function that runs the command with the provided arguments.
- * @param snapshotPath - The path to the snapshot file.
- * @param iso - The ISO value associated with the snapshot.
- * @returns A Promise that resolves when the snapshot processing is complete.
+ * @param {ProcessSnapshot} params - The parameters required to process the snapshot.
+ * @param {Function} params.run - A function that executes the given commands.
+ * @param {string} params.snapshotPath - The file path of the snapshot to be processed.
+ * @param {string} params.iso - The ISO value to be annotated on the snapshot.
+ *
+ * @returns {Promise<void>} A promise that resolves when the processing is complete.
  */
-export const processSnapshot = async (
-  run: (cmd1: string[], cmd2?: string[]) => Promise<string>,
-  snapshotPath: string,
-  iso: string,
-) => {
-  await run([
+export const processSnapshot = async (params: ProcessSnapshot) => {
+  await params.run([
     env("CONVERT_CMD"),
-    snapshotPath,
+    params.snapshotPath,
     "-font",
     "Helvetica",
     "-stroke",
@@ -36,7 +40,7 @@ export const processSnapshot = async (
     "black",
     "-annotate",
     "+60+45",
-    iso,
-    snapshotPath,
+    params.iso,
+    params.snapshotPath,
   ]);
 };

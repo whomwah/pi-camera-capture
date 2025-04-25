@@ -5,16 +5,21 @@ import { takeSnapshot } from "./lib/snapshot.ts";
 import { executeWithLogging, runPipedCommands } from "./lib/utils.ts";
 
 const runCheck = async () => {
-  const results = await executeWithLogging(
-    () => calcBrightness(runPipedCommands, 1.0),
+  const results = (await executeWithLogging(
+    () => calcBrightness({ run: runPipedCommands, brightness: 1.0 }),
     "Brightness found",
     "Brightness check failed!",
-  ) as string;
+  )) as string;
 
   const [brightness, shutterSpeed] = results.split(":");
 
   await executeWithLogging(
-    () => takeSnapshot(runPipedCommands, "brightness.jpg", shutterSpeed),
+    () =>
+      takeSnapshot({
+        run: runPipedCommands,
+        snapshotPath: "brightness.jpg",
+        shutterSpeed,
+      }),
     `Snapshot taken with --shutter ${shutterSpeed} for brightness ${brightness}`,
     "Brightness check failed!",
   );

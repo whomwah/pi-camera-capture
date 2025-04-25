@@ -1,4 +1,4 @@
-DATA_FILE = "data-test1.csv"
+DATA_FILE = "data.csv"
 
 print "Data file:", DATA_FILE
 

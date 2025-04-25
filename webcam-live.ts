@@ -14,22 +14,33 @@ import { calcBrightness } from "./lib/brightness.ts";
 const runCameraCapture = async () => {
   const { iso } = getFormattedDate();
 
-  const results = await executeWithLogging(
-    () => calcBrightness(runPipedCommands, 1.0),
+  const results = (await executeWithLogging(
+    () => calcBrightness({ run: runPipedCommands, brightness: 1.0 }),
     "Brightness found",
     "Brightness check failed!",
-  ) as string;
+  )) as string;
 
   const [brightness, shutterSpeed] = results.split(":");
 
   await executeWithLogging(
-    () => takeSnapshot(runPipedCommands, paths.liveshotPath, shutterSpeed),
+    () =>
+      takeSnapshot({
+        run: runPipedCommands,
+        snapshotPath: paths.liveshotPath,
+        shutterSpeed,
+        quality: "60",
+      }),
     `Snapshot taken: ${paths.liveshotPath} with --shutter ${shutterSpeed} for brightness ${brightness}`,
     `Snapshot [${iso}] failed!`,
   );
 
   await executeWithLogging(
-    () => processSnapshot(runPipedCommands, paths.liveshotPath, iso),
+    () =>
+      processSnapshot({
+        run: runPipedCommands,
+        snapshotPath: paths.liveshotPath,
+        iso,
+      }),
     `Snapshot processed: ${paths.liveshotPath}`,
     `Snapshot [${iso}] processing failed!`,
   );
@@ -41,7 +52,7 @@ const runCameraCapture = async () => {
   );
 
   await executeWithLogging(
-    () => syncSnapshot(runPipedCommands, paths.imagesDir),
+    () => syncSnapshot({ run: runPipedCommands, imagePath: paths.imagesDir }),
     `Files synced with S3`,
     `Error syncing with S3`,
   );

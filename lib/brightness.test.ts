@@ -5,7 +5,7 @@ import { mockRun } from "../__mocks/mocks.ts";
 Deno.test("takeSnapshot calls run with correct arguments", async () => {
   const mockEnv = stub(Deno.env, "get", () => "snapshot");
 
-  await calcBrightness(mockRun, 0.5);
+  await calcBrightness({ run: mockRun, brightness: 0.5 });
 
   assertSpyCalls(mockRun, 1);
   assertSpyCall(mockRun, 0, {

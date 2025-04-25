@@ -15,7 +15,7 @@ Deno.test("sync calls run with correct arguments", async () => {
   );
   const filePath = "path/images";
 
-  await syncSnapshot(mockRun, filePath);
+  await syncSnapshot({ run: mockRun, imagePath: filePath });
 
   assertSpyCalls(mockRun, 1);
   assertSpyCall(mockRun, 0, {

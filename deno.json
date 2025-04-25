@@ -8,7 +8,7 @@
     "run": "deno run --env -ERW --allow-run webcam.ts",
     "live": "deno run --env -ERW --allow-run webcam-live.ts",
     "brightness": "deno run --env -ERW --allow-run webcam-brightness.ts",
-    "graph": "deno run --allow-write graph/generate-data.ts > graph/data-test1.csv",
+    "graph": "deno run --allow-write graph/generate-data.ts > graph/data.csv",
     "plot": "cd graph;gnuplot -p plot.gp"
   }
 }

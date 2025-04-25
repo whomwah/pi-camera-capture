@@ -7,7 +7,7 @@ Deno.test("createTimeLapseVideo calls run with correct arguments", async () => {
   const videoPath = "path/to/video";
   const mockEnv = stub(Deno.env, "get", () => "ffmpeg");
 
-  await createTimeLapseVideo(mockRun, videoImagesPath, videoPath);
+  await createTimeLapseVideo({ run: mockRun, videoImagesPath, videoPath });
 
   assertSpyCalls(mockRun, 1);
   assertSpyCall(mockRun, 0, {
